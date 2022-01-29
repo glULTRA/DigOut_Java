@@ -4,10 +4,11 @@ import java.util.Scanner;
 public class DigOut 
 {
     // Properties
-    private Vector2 player_position = new Vector2();
-    private Vector2 mapsize = new Vector2();
-    private char[][] map = new char[mapsize.y][mapsize.x];
-    private char[] maplist = {'#','@','&','$'};
+    private Vector2 player_position = new Vector2(); // x and y coordinates.
+    private Vector2 mapsize = new Vector2(); // width and height of the map.
+    private char[][] map = new char[mapsize.y][mapsize.x]; // Map Tile.
+    private char[] maplist = {'#','@','&','$','+'};
+    class maplistMaximum{ public int sand ,block ,bomb ,coin ,life; };
     private Scanner scanner = new Scanner(System.in);
     private char action;
 
@@ -15,7 +16,7 @@ public class DigOut
      * @ [!] is_the_player
      * @ [#] is_sand
      * @ [@] is_block
-     * @ [&] is_bomm
+     * @ [&] is_bomb
      * @ [$] is_coin
      */
 
@@ -33,8 +34,12 @@ public class DigOut
             {' ',' ',' ',' ',' ',' ',' ',' '},
         };
         this.map = new_map;
+        this.Settings();
         this.GenerateRandomMap();
 
+    }
+    public void Settings(){
+        // We will go through it later.
     }
     public void Update(){
         // We should be able to handle input.
@@ -73,6 +78,12 @@ public class DigOut
         
             default:
                 System.out.println("Please make sure input is one of these : [w,a,s,d,i,j,k,l]");
+                try {
+                    Thread.sleep(1900);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 break;
         }
     }
@@ -133,9 +144,23 @@ public class DigOut
     public void GenerateRandomMap()
     {
         // First of always player's position is at 0,0 Coords.
-        map[0][0] = '!'; // Player position
-        player_position.x = 0;
-        player_position.y = 0;
+        this.map[0][0] = '!'; // Player position
+        this.player_position.x = 0;
+        this.player_position.y = 0;
+        
+        // Random Map algorithm.
+        int count_of_block = 0;
+        int count_of_bomb  = 0;
+        int count_of_life  = 0;
+        int count_of_coin  = 0;
+        int count_of_sand  = 0;
+
+        // Map list maximu size
+        maplistMaximum maplistmax = new maplistMaximum();
+        maplistmax.block = 10;
+        maplistmax.bomb = 2;
+        maplistmax.life = 1;
+        maplistmax.coin = 1;
 
         for(int i=0; i < mapsize.y; i++)
         {
@@ -143,9 +168,53 @@ public class DigOut
             {
                 // We should skip some cases.
                 // First we should skip player's position.
-                if(map[i][j]==map[0][0]) continue; 
+                if(map[i][j]==map[0][0]) continue;
+
+                // getting random number from 0 to 4 and casting it to integer.
+                int random = (int)(Math.random()*5);
+                
+                if(this.maplist[random] == '@')
+                    count_of_block++;
+                else if(this.maplist[random] == '&')
+                    count_of_bomb++;
+                else if(this.maplist[random] == '+')
+                    count_of_life++;
+                else if(this.maplist[random] == '$')
+                    count_of_coin++;
+                else if(this.maplist[random] == '#')
+                    count_of_sand++;
+
+                if(count_of_block > maplistmax.block)
+                {
+                    --count_of_block;
+                    --j;
+                    continue;
+                }
+                else if(count_of_bomb > maplistmax.bomb)
+                {
+                    --count_of_bomb;
+                    --j;
+                    continue;
+                }
+                else if(count_of_life > maplistmax.life){
+                    --count_of_life;
+                    --j;
+                    continue;
+                }
+                else if(count_of_coin > maplistmax.coin){
+                    --count_of_coin;
+                    --j;
+                    continue;
+                }
+
+                this.map[i][j] = this.maplist[random];
             }
         }
+
+        // Check if there is a coin.!!!
+        if(count_of_coin == 0)
+            this.GenerateRandomMap();
+        
     }
 
     public void Draw()
@@ -154,7 +223,7 @@ public class DigOut
         {
             for(int j = 0; j < mapsize.x; j++)
             {
-                System.out.print(map[i][j]);
+                System.out.print(map[i][j]+" ");
             }
             System.out.println();
         }
