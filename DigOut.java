@@ -162,6 +162,10 @@ public class DigOut
         maplistmax.life = 1;
         maplistmax.coin = 1;
 
+        // Checking cols and rows if those aren't block diagonally.
+        int entireRow = 0;
+        int entireColumn = 0;
+
         for(int i=0; i < mapsize.y; i++)
         {
             for(int j=0; j < mapsize.x; j++)
@@ -173,6 +177,7 @@ public class DigOut
                 // getting random number from 0 to 4 and casting it to integer.
                 int random = (int)(Math.random()*5);
                 
+                // Counting each element.
                 if(this.maplist[random] == '@')
                     count_of_block++;
                 else if(this.maplist[random] == '&')
@@ -184,6 +189,7 @@ public class DigOut
                 else if(this.maplist[random] == '#')
                     count_of_sand++;
 
+                // Check each elements maxmimum!
                 if(count_of_block > maplistmax.block)
                 {
                     --count_of_block;
@@ -207,6 +213,36 @@ public class DigOut
                     continue;
                 }
 
+                // Checking cols and rows if those aren't block vertically, horizontally or diagonally.
+                entireRow    = 0;
+                entireColumn = 0;
+                // Checking for horizontally.
+                for(int t = 0; t < mapsize.y; t++){
+                    if(map[t][j] == '@')
+                        entireRow++;
+                    if(entireRow > 2){
+                        --count_of_block;
+                        --j;
+                        continue;
+                    }
+                }
+                // Checking for vertically.
+                for(int t = 0; t < mapsize.x; t++){
+                    if(map[i][t] == '@'){
+                        entireColumn++;
+                    }
+                    if(entireColumn > 4){
+                        --count_of_block;
+                        --j;
+                        continue;
+                    }
+                }
+
+                // Checking for diagonally.
+
+
+
+                // Finally we should send it to the map :)
                 this.map[i][j] = this.maplist[random];
             }
         }
